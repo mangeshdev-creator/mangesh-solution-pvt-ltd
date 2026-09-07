@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import { listAdminLoginAttempts, listUsers, login, me, register, requestPasswordReset, resetPassword, updateUserBlockStatus, updateUserRole } from '../controllers/authController.js';
+import { protect, superAdminOnly } from '../middleware/auth.js';
+const router = Router();
+router.post('/register', register);
+router.post('/login', login);
+router.post('/forgot-password', requestPasswordReset);
+router.post('/reset-password/:token', resetPassword);
+router.get('/me', protect, me);
+router.get('/users', protect, superAdminOnly, listUsers);
+router.patch('/users/:userId/role', protect, superAdminOnly, updateUserRole);
+router.patch('/users/:userId/block', protect, superAdminOnly, updateUserBlockStatus);
+router.get('/admin-login-attempts', protect, superAdminOnly, listAdminLoginAttempts);
+export default router;
