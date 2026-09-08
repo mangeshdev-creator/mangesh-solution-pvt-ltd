@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { CheckCircle, CreditCard } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, CheckCircle, CreditCard } from "lucide-react";
 import { apiRequest } from "../api";
 
 const DemoPayment = () => {
   const { sessionId } = useParams();
+  const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [paid, setPaid] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +43,14 @@ const DemoPayment = () => {
             <CheckCircle size={64} className="mx-auto text-green-400" />
             <h1 className="text-2xl font-bold mt-5">Payment Successful</h1>
             <p className="text-gray-400 mt-3">You can return to the enrollment page.</p>
+            <button
+              type="button"
+              onClick={() => navigate(`/enroll/${session.courseId}`, { state: { paymentSuccess: true } })}
+              className="w-full mt-6 bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-3 rounded-xl cursor-pointer flex items-center justify-center gap-2"
+            >
+              <ArrowLeft size={18} />
+              Back to Enrollment
+            </button>
           </>
         ) : (
           <>

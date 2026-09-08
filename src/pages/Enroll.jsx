@@ -1,13 +1,13 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import courses from "../data/courses";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api";
 import { ArrowLeft, CheckCircle, CreditCard } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
 
 function Enroll() {
   const { id } = useParams();
+  const location = useLocation();
 
   const course = courses.find((item) => item.id === Number(id));
 
@@ -59,6 +59,13 @@ function Enroll() {
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
   };
+
+  useEffect(() => {
+    if (location.state?.paymentSuccess) {
+      setSuccess(true);
+      setPaymentOpen(false);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (!paymentSession?.sessionId || success) return undefined;
@@ -118,13 +125,18 @@ function Enroll() {
           <div className="mt-8 space-y-5 text-center">
             <div className="rounded-2xl border border-cyan-400/30 bg-slate-800 p-6">
               <CreditCard size={42} className="mx-auto text-cyan-400" />
-              <h2 className="text-xl md:text-2xl text-white font-bold mt-4">Scan to Pay</h2>
-              <p className="text-gray-400 mt-2">Scan this QR code with your mobile.</p>
-              <div className="bg-white p-4 rounded-xl w-fit mx-auto mt-5">
-                <QRCodeSVG value={`${window.location.origin}/demo-payment/${paymentSession?.sessionId}`} size={190} />
-              </div>
-              <p className="text-cyan-400 text-2xl font-bold mt-4">{course.price}</p>
+              <h2 className="text-xl md:text-2xl text-white font-bold mt-4">Complete Payment</h2>
+              <p className="text-gray-400 mt-2">Open the demo payment page to complete your payment.</p>
+              <p className="text-cyan-400 text-2xl font-bold mt-5">{course.price}</p>
               <p className="text-gray-500 text-sm mt-2">This is a fake payment for testing only.</p>
+
+              <button
+                type="button"
+                onClick={() => window.open(`${window.location.origin}/demo-payment/${paymentSession?.sessionId}`, "_blank", "noopener,noreferrer")}
+                className="w-full mt-5 bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-3 md:py-4 rounded-xl cursor-pointer"
+              >
+                Open Payment Page
+              </button>
             </div>
 
             {error && <p className="text-red-500">{error}</p>}
