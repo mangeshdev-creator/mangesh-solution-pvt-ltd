@@ -31,16 +31,16 @@ export const sendWelcomeEmail = async ({ name, email }) => {
   return true;
 };
 
-export const sendEnrollmentEmail = async ({ name, email, courseTitle, coursePrice }) => {
+export const sendEnrollmentEmail = async ({ name, email, courseTitle, coursePrice, transactionId }) => {
   const transporter = getTransporter();
   if (!transporter) return false;
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: email,
-    subject: `Enrollment successful: ${courseTitle}`,
-    text: `Hi ${name},\n\nYour enrollment in ${courseTitle} was successful.\nCourse fee: ${coursePrice}\n\nThank you,\nMangesh Solution`,
-    html: `<p>Hi ${name},</p><p>Your enrollment in <strong>${courseTitle}</strong> was successful.</p><p><strong>Course fee:</strong> ${coursePrice}</p><p>Thank you,<br />Mangesh Solution</p>`,
+    subject: `Payment submitted: ${courseTitle}`,
+    text: `Hi ${name},\n\nYour payment details for ${courseTitle} were submitted for verification.\nCourse fee: ${coursePrice}\nUTR / Transaction ID: ${transactionId}\n\nThank you,\nMangesh Solution`,
+    html: `<p>Hi ${name},</p><p>Your payment details for <strong>${courseTitle}</strong> were submitted for verification.</p><p><strong>Course fee:</strong> ${coursePrice}<br /><strong>UTR / Transaction ID:</strong> ${transactionId}</p><p>Thank you,<br />Mangesh Solution</p>`,
   });
 
   return true;
