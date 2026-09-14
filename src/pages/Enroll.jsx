@@ -18,8 +18,6 @@ function Enroll() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const [transactionId, setTransactionId] = useState("");
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -32,27 +30,26 @@ function Enroll() {
     try {
       setLoading(true);
       setError("");
-      setPaymentOpen(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitPaymentDetails = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      setError("");
-      const data = await apiRequest("/enrollments", {
+      const payment = await apiRequest("/payments/create", {
         method: "POST",
-        body: JSON.stringify({ ...formData, courseId: id, transactionId }),
+        body: JSON.stringify({ ...formData, courseId: id }),
       });
-      setSuccess(true);
-      if (!data.emailSent) setError("Enrollment successful, but confirmation email could not be sent.");
-      setFormData({ name: "", email: "", phone: "" });
-      setTransactionId("");
+      const script = document.createElement("script");
+      script.src = `https://${payment.environment === "staging" ? "securegw-stage" : "securegw"}.paytm.in/merchantpgpui/checkoutjs/merchants/${payment.mid}.js`;
+      script.onload = async () => {
+        if (!window.Paytm?.CheckoutJS) {
+          setError("Paytm checkout could not be loaded.");
+          return;
+        }
+        await window.Paytm.CheckoutJS.init({
+          root: "",
+          flow: "DEFAULT",
+          data: { orderId: payment.orderId, token: payment.txnToken, tokenType: "TXN_TOKEN", amount: String(payment.amount) },
+        });
+        window.Paytm.CheckoutJS.invoke();
+      };
+      script.onerror = () => setError("Paytm checkout could not be loaded.");
+      document.body.appendChild(script);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -96,43 +93,6 @@ function Enroll() {
             </Link>
 
           </div>
-        ) : paymentOpen ? (
-          <form onSubmit={submitPaymentDetails} className="space-y-5 mt-8 text-center">
-            <div className="rounded-2xl border border-cyan-400/30 bg-slate-800 p-5">
-              <h2 className="text-xl md:text-2xl text-white font-bold">Pay via UPI</h2>
-              <p className="text-gray-400 mt-2">Scan this QR code and pay the exact course fee.</p>
-              <img src="/upi-qr.jpeg" alt="UPI payment QR code" className="w-64 h-64 mx-auto mt-5 rounded-xl bg-white p-2" />
-              <p className="text-cyan-400 text-2xl font-bold mt-5">{course.price}</p>
-            </div>
-
-            <input
-              type="text"
-              placeholder="UPI UTR / Transaction ID"
-              value={transactionId}
-              onChange={(e) => setTransactionId(e.target.value)}
-              required
-              className="w-full p-3 md:p-4 rounded-xl bg-slate-800 text-white outline-none"
-            />
-
-            {error && <p className="text-red-500 text-center">{error}</p>}
-            <p className="text-gray-400 text-sm">Your enrollment will be confirmed after payment verification.</p>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:opacity-60 py-3 md:py-4 rounded-xl text-black font-bold cursor-pointer"
-            >
-              {loading ? "Submitting..." : "Submit Payment Details"}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setPaymentOpen(false)}
-              className="w-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black py-3 md:py-4 rounded-xl font-semibold transition cursor-pointer"
-            >
-              Back to Details
-            </button>
-          </form>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5 mt-8">
             {error && <p className="text-red-500 text-center">{error}</p>}
@@ -173,7 +133,7 @@ function Enroll() {
               type="submit"
               className="w-full bg-cyan-500 hover:bg-cyan-600 py-3 md:py-4 rounded-xl text-black font-bold cursor-pointer"
             >
-              {loading ? "Submitting..." : "Confirm Enrollment"}
+              {loading ? "Opening Paytm..." : "Pay ₹1 & Enroll"}
             </button>
 
             <Link

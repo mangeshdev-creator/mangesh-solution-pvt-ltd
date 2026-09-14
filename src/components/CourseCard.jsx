@@ -10,6 +10,7 @@ function CourseCard({
   level,
   price,
   description,
+  isEnrolled,
 }) {
   return (
     <BorderGlow
@@ -68,9 +69,9 @@ function CourseCard({
             </button>
           </Link>
 
-          <Link to={`/enroll/${id}`} className="flex-1">
+          <Link to={isEnrolled ? "/profile" : `/enroll/${id}`} className="flex-1">
             <button className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-xl hover:scale-105 transition duration-300 font-semibold shadow-lg shadow-cyan-500/30 cursor-pointer">
-              Enroll Now
+              {isEnrolled ? "Start Learning" : "Enroll Now"}
             </button>
           </Link>
         </div>

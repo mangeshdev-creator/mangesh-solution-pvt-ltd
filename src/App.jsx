@@ -19,6 +19,7 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import AdminLoginModal from "./components/AdminLoginModal";
 import ResetPassword from "./pages/ResetPassword";
+import PaymentResult from "./pages/PaymentResult";
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = Boolean(localStorage.getItem("mangesh_token"));
@@ -61,6 +62,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/payment-result" element={<ProtectedRoute><PaymentResult /></ProtectedRoute>} />
         <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />

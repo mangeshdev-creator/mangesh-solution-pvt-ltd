@@ -1,7 +1,27 @@
 import CourseCard from "../components/CourseCard";
 import courses from "../data/courses";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { apiRequest } from "../api";
 
 function Courses() {
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
+
+  useEffect(() => {
+    apiRequest("/enrollments/me")
+      .then((enrollments) => {
+        setEnrolledCourseIds(
+          enrollments
+            .filter((enrollment) => enrollment.status === "confirmed" && enrollment.paymentStatus === "paid")
+            .map((enrollment) => enrollment.course?.frontendId)
+        );
+      })
+      .catch((err) => {
+        console.error("Could not load enrollment status:", err);
+        setEnrolledCourseIds([]);
+      });
+  }, []);
+
   return (
     <section className="bg-slate-950 min-h-screen py-14 md:py-20 px-5 sm:px-6 lg:px-8">
       
@@ -30,6 +50,7 @@ function Courses() {
             level={course.level}
             price={course.price}
             description={course.description}
+            isEnrolled={enrolledCourseIds.includes(course.id)}
           />
         ))}
       </div>
@@ -45,9 +66,9 @@ function Courses() {
           practical training, live projects, and career guidance.
         </p>
 
-        <button className="mt-8 w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-white font-semibold hover:scale-105 transition duration-300 shadow-lg shadow-cyan-500/30 cursor-pointer">
+        <Link to="/courses" className="inline-block mt-8 w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-white font-semibold hover:scale-105 transition duration-300 shadow-lg shadow-cyan-500/30">
           Explore All Courses
-        </button>
+        </Link>
       </div>
 
     </section>
