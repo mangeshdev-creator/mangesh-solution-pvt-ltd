@@ -40,6 +40,7 @@ Optional: create `.env` from `.env.example` if your API URL is different.
 
 The repository includes a GitHub Actions workflow in `.github/workflows/deploy.yml`.
 Before enabling it, add a repository secret named `VITE_API_URL` containing the deployed backend API URL, for example `https://your-backend.example.com/api`.
-Then enable **Settings -> Pages -> GitHub Actions**. Every push to `main` will build and deploy the frontend.
+In **Settings -> Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch”).
+Every push to `main` will then build the app with Vite and deploy the generated `dist` folder.
 
 GitHub Pages hosts only the frontend. Deploy the `backend` separately and set its `CLIENT_URL` to the GitHub Pages URL.
