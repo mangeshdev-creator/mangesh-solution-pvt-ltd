@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Ban, Mail, RefreshCw, ShieldCheck, Users } from "lucide-react";
+import { Ban, Mail, RefreshCw, ShieldCheck, Trash2, Users } from "lucide-react";
 import { apiRequest } from "../api";
 import { formatCurrency } from "../utils/currency";
 
@@ -58,6 +58,16 @@ const Admin = () => {
     }
   };
 
+  const deleteEnrollment = async (enrollmentId) => {
+    if (!window.confirm("Delete this enrollment permanently?")) return;
+    try {
+      await apiRequest(`/enrollments/${enrollmentId}`, { method: "DELETE" });
+      setEnrollments((currentEnrollments) => currentEnrollments.filter((item) => item._id !== enrollmentId));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     loadDashboard();
   }, []);
@@ -104,6 +114,13 @@ const Admin = () => {
                       <p className="text-cyan-400 text-sm mt-1">{item.course?.title} · {formatCurrency(item.course?.price)}</p>
                       <p className="text-gray-500 text-sm mt-1">{item.status} · {item.paymentStatus || "pending"}</p>
                       {item.transactionId && <p className="text-gray-500 text-sm mt-1">UTR: {item.transactionId}</p>}
+                      <button
+                        type="button"
+                        onClick={() => deleteEnrollment(item._id)}
+                        className="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-400/60 px-3 py-2 text-sm text-red-300 transition hover:bg-red-400 hover:text-black"
+                      >
+                        <Trash2 size={15} /> Delete Enrollment
+                      </button>
                     </div>
                   ))}
                 </div>

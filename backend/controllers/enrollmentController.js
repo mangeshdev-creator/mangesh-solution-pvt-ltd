@@ -49,3 +49,9 @@ export const getMyEnrollments = async (req, res) => {
 
   res.json(enrollments);
 };
+
+export const deleteEnrollment = async (req, res) => {
+  const enrollment = await Enrollment.findByIdAndDelete(req.params.enrollmentId);
+  if (!enrollment) return res.status(404).json({ message: 'Enrollment not found' });
+  res.json({ message: 'Enrollment deleted successfully' });
+};
