@@ -51,11 +51,19 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ message: 'Server error' });
 });
 
-connectDB().then(async () => {
+export const initializeApp = async () => {
   await seedCourses();
   await seedAdmin();
-  app.listen(PORT, () => console.log(`Mangesh Solution API running on http://localhost:${PORT}`));
-}).catch((err) => {
-  console.error('Database connection failed:', err.message);
-  process.exit(1);
-});
+};
+
+if (process.env.VERCEL !== '1') {
+  connectDB().then(async () => {
+    await initializeApp();
+    app.listen(PORT, () => console.log(`Mangesh Solution API running on http://localhost:${PORT}`));
+  }).catch((err) => {
+    console.error('Database connection failed:', err.message);
+    process.exit(1);
+  });
+}
+
+export default app;
