@@ -16,7 +16,6 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Enroll from "./pages/Enroll";
 import Profile from "./pages/Profile";
-import DemoPayment from "./pages/DemoPayment";
 import Admin from "./pages/Admin";
 import AdminLoginModal from "./components/AdminLoginModal";
 import ResetPassword from "./pages/ResetPassword";
@@ -43,7 +42,7 @@ function App() {
 function AppContent() {
   const location = useLocation();
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname.startsWith("/demo-payment/") || location.pathname.startsWith("/reset-password/");
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register" || location.pathname.startsWith("/reset-password/");
 
   useEffect(() => {
     const handleControlKey = (event) => {
@@ -62,7 +61,6 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/demo-payment/:sessionId" element={<DemoPayment />} />
         <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />

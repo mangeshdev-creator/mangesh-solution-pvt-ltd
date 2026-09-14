@@ -1,14 +1,12 @@
-import { useLocation, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useState } from "react";
 import courses from "../data/courses";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api";
-import { ArrowLeft, CheckCircle, CreditCard } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 
 function Enroll() {
   const { id } = useParams();
-  const location = useLocation();
-
   const course = courses.find((item) => item.id === Number(id));
 
   const [formData, setFormData] = useState({
@@ -20,9 +18,6 @@ function Enroll() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const [paymentSession, setPaymentSession] = useState(null);
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -35,55 +30,19 @@ function Enroll() {
     try {
       setLoading(true);
       setError("");
-      const session = await apiRequest("/payments/session", {
+      const data = await apiRequest("/enrollments", {
         method: "POST",
         body: JSON.stringify({ ...formData, courseId: id }),
       });
-      setPaymentSession(session);
-      setPaymentOpen(true);
+      setSuccess(true);
+      if (!data.emailSent) setError("Enrollment successful, but confirmation email could not be sent.");
+      setFormData({ name: "", email: "", phone: "" });
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-  const completeEnrollment = async (transactionId) => {
-    try {
-      setLoading(true);
-      setError("");
-      const data = await apiRequest("/enrollments", { method: "POST", body: JSON.stringify({ ...formData, courseId: id, paymentId: transactionId }) });
-      setSuccess(true);
-      if (!data.emailSent) setError("Enrollment successful, but confirmation email could not be sent.");
-      setFormData({ name: "", email: "", phone: "" });
-    } catch (err) { setError(err.message); }
-    finally { setLoading(false); }
-  };
-
-  useEffect(() => {
-    if (location.state?.paymentSuccess) {
-      setSuccess(true);
-      setPaymentOpen(false);
-    }
-  }, [location.state]);
-
-  useEffect(() => {
-    if (!paymentSession?.sessionId || success) return undefined;
-
-    const intervalId = window.setInterval(async () => {
-      try {
-        const session = await apiRequest(`/payments/${paymentSession.sessionId}`);
-        if (session.status === "paid") {
-          window.clearInterval(intervalId);
-          await completeEnrollment(session.transactionId);
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    }, 2000);
-
-    return () => window.clearInterval(intervalId);
-  }, [paymentSession, success]);
 
   return (
     <section className="min-h-screen bg-slate-950 flex items-center justify-center px-5 sm:px-6 lg:px-8 py-14 md:py-20">
@@ -120,36 +79,6 @@ function Enroll() {
               </button>
             </Link>
 
-          </div>
-        ) : paymentOpen ? (
-          <div className="mt-8 space-y-5 text-center">
-            <div className="rounded-2xl border border-cyan-400/30 bg-slate-800 p-6">
-              <CreditCard size={42} className="mx-auto text-cyan-400" />
-              <h2 className="text-xl md:text-2xl text-white font-bold mt-4">Complete Payment</h2>
-              <p className="text-gray-400 mt-2">Open the demo payment page to complete your payment.</p>
-              <p className="text-cyan-400 text-2xl font-bold mt-5">{course.price}</p>
-              <p className="text-gray-500 text-sm mt-2">This is a fake payment for testing only.</p>
-
-              <button
-                type="button"
-                onClick={() => window.open(`${window.location.origin}/demo-payment/${paymentSession?.sessionId}`, "_blank", "noopener,noreferrer")}
-                className="w-full mt-5 bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-3 md:py-4 rounded-xl cursor-pointer"
-              >
-                Open Payment Page
-              </button>
-            </div>
-
-            {error && <p className="text-red-500">{error}</p>}
-
-            <p className="text-cyan-400 text-sm">Waiting for payment confirmation...</p>
-
-            <button
-              type="button"
-              onClick={() => setPaymentOpen(false)}
-              className="w-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black py-3 md:py-4 rounded-xl font-semibold transition cursor-pointer"
-            >
-              Back to Details
-            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5 mt-8">
