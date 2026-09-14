@@ -5,8 +5,10 @@ import Enrollment from '../models/Enrollment.js';
 import PaymentOrder from '../models/PaymentOrder.js';
 import { sendEnrollmentEmail } from '../utils/sendEmail.js';
 
-const isConfigured = () => process.env.PAYTM_MID && process.env.PAYTM_MERCHANT_KEY;
-const isStaging = process.env.PAYTM_ENVIRONMENT !== 'production';
+const paytmMid = () => process.env.PAYTM_MID?.trim();
+const paytmMerchantKey = () => process.env.PAYTM_MERCHANT_KEY?.trim();
+const isConfigured = () => Boolean(paytmMid() && paytmMerchantKey());
+const isStaging = (process.env.PAYTM_ENVIRONMENT || 'staging').trim().toLowerCase() !== 'production';
 const paytmHost = isStaging ? 'https://securegw-stage.paytm.in' : 'https://securegw.paytm.in';
 const websiteName = isStaging ? 'WEBSTAGING' : 'DEFAULT';
 
@@ -55,18 +57,18 @@ export const createPayment = async (req, res) => {
   const callbackUrl = `${process.env.BACKEND_URL || 'https://mangesh-solution-pvt-ltd-o542.vercel.app'}/api/payments/callback`;
   const body = {
     requestType: 'Payment',
-    mid: process.env.PAYTM_MID,
+    mid: paytmMid(),
     websiteName,
     orderId,
     callbackUrl,
     txnAmount: { value: course.price.toFixed(2), currency: 'INR' },
     userInfo: { custId: String(req.user._id), email, mobile: phone },
   };
-  const signature = await paytmChecksum.generateSignature(JSON.stringify(body), process.env.PAYTM_MERCHANT_KEY);
+  const signature = await paytmChecksum.generateSignature(JSON.stringify(body), paytmMerchantKey());
   let response;
   let data;
   try {
-    response = await fetch(`${paytmHost}/theia/api/v1/initiateTransaction?mid=${process.env.PAYTM_MID}&orderId=${orderId}`, {
+    response = await fetch(`${paytmHost}/theia/api/v1/initiateTransaction?mid=${encodeURIComponent(paytmMid())}&orderId=${encodeURIComponent(orderId)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ body, head: { signature } }),
@@ -87,7 +89,7 @@ export const createPayment = async (req, res) => {
         : 'Paytm rejected the payment request',
     });
   }
-  res.status(201).json({ orderId, txnToken: data.body.txnToken, amount: course.price, mid: process.env.PAYTM_MID, environment: isStaging ? 'staging' : 'production' });
+  res.status(201).json({ orderId, txnToken: data.body.txnToken, amount: course.price, mid: paytmMid(), environment: isStaging ? 'staging' : 'production' });
 };
 
 export const paymentCallback = async (req, res) => {
@@ -95,7 +97,7 @@ export const paymentCallback = async (req, res) => {
   const checksum = payload.CHECKSUMHASH;
   const values = { ...payload };
   delete values.CHECKSUMHASH;
-  if (!checksum || !(await paytmChecksum.verifySignature(values, process.env.PAYTM_MERCHANT_KEY, checksum))) {
+  if (!checksum || !(await paytmChecksum.verifySignature(values, paytmMerchantKey(), checksum))) {
     return res.status(400).send('Invalid payment signature');
   }
 
