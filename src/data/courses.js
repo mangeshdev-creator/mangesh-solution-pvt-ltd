@@ -5,7 +5,7 @@ const courses = [
     title: "React.js Development",
     duration: "3 Months",
     level: "Intermediate",
-    price: "₹4,999",
+    price: "₹1",
     description:
       "Master React.js with Hooks, Context API, React Router, Tailwind CSS, API integration, and real-world projects.",
   },
@@ -15,7 +15,7 @@ const courses = [
     title: "MERN Stack Development",
     duration: "6 Months",
     level: "Advanced",
-    price: "₹6,999",
+    price: "₹1",
     description:
       "Become a Full Stack Developer by learning MongoDB, Express.js, React.js, Node.js, REST APIs, Authentication, and Deployment.",
   },
@@ -25,7 +25,7 @@ const courses = [
     title: "Java Full Stack",
     duration: "6 Months",
     level: "Beginner",
-    price: "₹5,999",
+    price: "₹1",
     description:
       "Learn Core Java, Advanced Java, JDBC, Servlets, JSP, MySQL, HTML, CSS, JavaScript, and build enterprise applications.",
   },
@@ -35,7 +35,7 @@ const courses = [
     title: "Python Programming",
     duration: "3 Months",
     level: "Beginner",
-    price: "₹4,999",
+    price: "₹1",
     description:
       "Build a strong programming foundation with Python, OOP, File Handling, Automation, APIs, and real-world coding projects.",
   },
@@ -45,7 +45,7 @@ const courses = [
     title: "Artificial Intelligence & ML",
     duration: "6 Months",
     level: "Advanced",
-    price: "₹6,499",
+    price: "₹1",
     description:
       "Learn Artificial Intelligence, Machine Learning, Data Science, TensorFlow, Pandas, NumPy, and Scikit-Learn through practical projects.",
   },
@@ -55,7 +55,7 @@ const courses = [
     title: "Flutter App Development",
     duration: "4 Months",
     level: "Intermediate",
-    price: "₹5,499",
+    price: "₹1",
     description:
       "Develop beautiful Android & iOS applications using Flutter, Dart, Firebase, REST APIs, and modern UI design.",
   },
@@ -65,7 +65,7 @@ const courses = [
     title: "UI/UX Design",
     duration: "2 Months",
     level: "Beginner",
-    price: "₹4,999",
+    price: "₹1",
     description:
       "Learn Figma, Wireframing, Prototyping, User Research, Design Systems, and create stunning user experiences.",
   },
@@ -75,7 +75,7 @@ const courses = [
     title: "Cloud Computing",
     duration: "5 Months",
     level: "Advanced",
-    price: "₹6,999",
+    price: "₹1",
     description:
       "Master AWS, Azure, Google Cloud, Docker, Kubernetes, CI/CD, and cloud deployment with hands-on practice.",
   },
@@ -85,7 +85,7 @@ const courses = [
     title: "Cyber Security",
     duration: "5 Months",
     level: "Advanced",
-    price: "₹6,999",
+    price: "₹1",
     description:
       "Learn Ethical Hacking, Network Security, Penetration Testing, Kali Linux, OWASP, and Cyber Security fundamentals.",
   },
