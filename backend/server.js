@@ -25,6 +25,7 @@ const allowedOrigins = new Set([
     .filter(Boolean)
     .map(normalizeOrigin),
   'https://mangeshdev-creator.github.io',
+  'https://mangesh-solution-pvt-ltd.vercel.app',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
