@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Mail, Phone, UserRound } from "lucide-react";
+import { BookOpen, Download, Mail, Phone, UserRound } from "lucide-react";
 import { apiRequest } from "../api";
 
 const Profile = () => {
@@ -54,6 +54,17 @@ const Profile = () => {
                 <p className="text-cyan-400 capitalize mt-3">Status: {enrollment.status}</p>
                 <p className="text-green-400 capitalize">Payment: {enrollment.paymentStatus}</p>
                 {enrollment.transactionId && <p className="text-gray-500 text-sm mt-1">UTR: {enrollment.transactionId}</p>}
+                {enrollment.course?.frontendId === 1 && (
+                  <a
+                    href="/Mangesh_Solution_React_JS_Development_Notes.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 px-4 py-3 font-semibold text-black transition hover:bg-cyan-400"
+                  >
+                    <Download size={18} />
+                    Open React.js Notes
+                  </a>
+                )}
               </div>
             ))}
           </div>
