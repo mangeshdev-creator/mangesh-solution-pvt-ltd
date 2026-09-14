@@ -63,13 +63,24 @@ export const createPayment = async (req, res) => {
     userInfo: { custId: String(req.user._id), email, mobile: phone },
   };
   const signature = await paytmChecksum.generateSignature(JSON.stringify(body), process.env.PAYTM_MERCHANT_KEY);
-  const response = await fetch(`${paytmHost}/theia/api/v1/initiateTransaction?mid=${process.env.PAYTM_MID}&orderId=${orderId}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', signature },
-    body: JSON.stringify({ body, head: { signature } }),
-  });
-  const data = await response.json();
-  if (!response.ok || !data.body?.txnToken) return res.status(502).json({ message: 'Unable to start Paytm payment' });
+  let response;
+  let data;
+  try {
+    response = await fetch(`${paytmHost}/theia/api/v1/initiateTransaction?mid=${process.env.PAYTM_MID}&orderId=${orderId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body, head: { signature } }),
+    });
+    data = await response.json();
+  } catch (error) {
+    console.error('Paytm request failed:', error.message);
+    return res.status(502).json({ message: 'Paytm gateway is unavailable' });
+  }
+  if (!response.ok || !data.body?.txnToken) {
+    const gatewayMessage = data.body?.resultInfo?.resultMsg || data.body?.resultInfo?.resultStatus;
+    console.error('Paytm payment initialization failed:', data);
+    return res.status(502).json({ message: gatewayMessage || 'Paytm rejected the payment request' });
+  }
   res.status(201).json({ orderId, txnToken: data.body.txnToken, amount: course.price, mid: process.env.PAYTM_MID, environment: isStaging ? 'staging' : 'production' });
 };
 
