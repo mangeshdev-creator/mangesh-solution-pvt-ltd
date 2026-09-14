@@ -37,19 +37,21 @@ function Enroll() {
       const script = document.createElement("script");
       script.src = `https://${payment.environment === "staging" ? "securegw-stage" : "securegw"}.paytm.in/merchantpgpui/checkoutjs/merchants/${payment.mid}.js`;
       script.onload = async () => {
-        if (!window.Paytm?.CheckoutJS) {
-          setError("Paytm checkout could not be loaded.");
-          return;
+        try {
+          if (!window.Paytm?.CheckoutJS) throw new Error("Paytm checkout could not be loaded.");
+          await window.Paytm.CheckoutJS.init({
+            root: "",
+            flow: "DEFAULT",
+            data: { orderId: payment.orderId, token: payment.txnToken, tokenType: "TXN_TOKEN", amount: String(payment.amount) },
+          });
+          window.Paytm.CheckoutJS.invoke();
+        } catch (err) {
+          setError(err.message || "Paytm checkout could not be started.");
         }
-        await window.Paytm.CheckoutJS.init({
-          root: "",
-          flow: "DEFAULT",
-          data: { orderId: payment.orderId, token: payment.txnToken, tokenType: "TXN_TOKEN", amount: String(payment.amount) },
-        });
-        window.Paytm.CheckoutJS.invoke();
       };
       script.onerror = () => setError("Paytm checkout could not be loaded.");
       document.body.appendChild(script);
+      return;
     } catch (err) {
       setError(err.message);
     } finally {
