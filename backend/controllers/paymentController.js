@@ -77,9 +77,15 @@ export const createPayment = async (req, res) => {
     return res.status(502).json({ message: 'Paytm gateway is unavailable' });
   }
   if (!response.ok || !data.body?.txnToken) {
-    const gatewayMessage = data.body?.resultInfo?.resultMsg || data.body?.resultInfo?.resultStatus;
+    const resultInfo = data.body?.resultInfo || {};
+    const gatewayCode = resultInfo.resultCode ? ` (${resultInfo.resultCode})` : '';
+    const gatewayMessage = resultInfo.resultMsg || resultInfo.resultStatus;
     console.error('Paytm payment initialization failed:', data);
-    return res.status(502).json({ message: gatewayMessage || 'Paytm rejected the payment request' });
+    return res.status(502).json({
+      message: gatewayMessage
+        ? `Paytm rejected the payment request${gatewayCode}: ${gatewayMessage}`
+        : 'Paytm rejected the payment request',
+    });
   }
   res.status(201).json({ orderId, txnToken: data.body.txnToken, amount: course.price, mid: process.env.PAYTM_MID, environment: isStaging ? 'staging' : 'production' });
 };
