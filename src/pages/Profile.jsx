@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Download, Mail, Phone, UserRound } from "lucide-react";
 import { apiRequest } from "../api";
+import { formatCurrency } from "../utils/currency";
 
 const Profile = () => {
   const user = JSON.parse(localStorage.getItem("mangesh_user") || "{}");
@@ -49,7 +50,7 @@ const Profile = () => {
               <div key={enrollment._id} className="bg-[#10273A] rounded-2xl p-6 border border-cyan-500/20">
                 <BookOpen size={28} className="text-cyan-400" />
                 <h3 className="text-xl font-bold mt-4">{enrollment.course?.title}</h3>
-                <p className="text-gray-400 mt-2">Fee: {enrollment.course?.price}</p>
+                <p className="text-gray-400 mt-2">Fee: {formatCurrency(enrollment.course?.price)}</p>
                 <p className="text-gray-400">Duration: {enrollment.course?.duration}</p>
                 <p className="text-cyan-400 capitalize mt-3">Status: {enrollment.status}</p>
                 <p className="text-green-400 capitalize">Payment: {enrollment.paymentStatus}</p>
