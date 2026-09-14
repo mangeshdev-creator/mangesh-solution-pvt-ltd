@@ -12,8 +12,20 @@ import { seedAdmin } from './utils/seedAdmin.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const normalizeOrigin = (origin) => {
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return origin;
+  }
+};
 const allowedOrigins = new Set([
-  ...(process.env.CLIENT_URL || '').split(',').map((origin) => origin.trim()).filter(Boolean),
+  ...(process.env.CLIENT_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .map(normalizeOrigin),
+  'https://mangeshdev-creator.github.io',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
@@ -22,7 +34,7 @@ const allowedOrigins = new Set([
 app.use(cors({
   origin: (origin, callback) => {
     const isLocalNetworkOrigin = /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?$/.test(origin || '');
-    if (!origin || allowedOrigins.has(origin) || isLocalNetworkOrigin) return callback(null, true);
+    if (!origin || allowedOrigins.has(normalizeOrigin(origin)) || isLocalNetworkOrigin) return callback(null, true);
     return callback(new Error('Origin is not allowed by CORS'));
   },
 }));
