@@ -112,8 +112,7 @@ const Admin = () => {
                     <div key={item._id} className="border-b border-white/10 pb-4">
                       <p className="font-semibold">{item.name} <span className="text-gray-400 font-normal">({item.email})</span></p>
                       <p className="text-cyan-400 text-sm mt-1">{item.course?.title} · {formatCurrency(item.course?.price)}</p>
-                      <p className="text-gray-500 text-sm mt-1">{item.status} · {item.paymentStatus || "pending"}</p>
-                      {item.transactionId && <p className="text-gray-500 text-sm mt-1">UTR: {item.transactionId}</p>}
+                      <p className="text-gray-500 text-sm mt-1">Enrolled: {item.status}</p>
                       <button
                         type="button"
                         onClick={() => deleteEnrollment(item._id)}

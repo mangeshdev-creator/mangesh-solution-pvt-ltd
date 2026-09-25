@@ -9,6 +9,20 @@ function Enroll() {
   const { id } = useParams();
   const course = courses.find((item) => item.id === Number(id));
 
+  if (!course) {
+    return (
+      <section className="min-h-screen bg-slate-950 flex items-center justify-center px-5 py-14">
+        <div className="bg-slate-900 rounded-3xl p-8 text-center max-w-md w-full">
+          <h1 className="text-2xl font-bold text-white">Course not found</h1>
+          <p className="text-gray-400 mt-3">This course is not available right now.</p>
+          <Link to="/courses" className="mt-6 inline-block bg-cyan-500 text-black font-bold px-6 py-3 rounded-xl">
+            Back to Courses
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,6 +32,7 @@ function Enroll() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -30,28 +45,11 @@ function Enroll() {
     try {
       setLoading(true);
       setError("");
-      const payment = await apiRequest("/payments/create", {
+      await apiRequest("/enrollments/create", {
         method: "POST",
         body: JSON.stringify({ ...formData, courseId: id }),
       });
-      const script = document.createElement("script");
-      script.src = `https://${payment.environment === "staging" ? "securegw-stage" : "securegw"}.paytm.in/merchantpgpui/checkoutjs/merchants/${payment.mid}.js`;
-      script.onload = async () => {
-        try {
-          if (!window.Paytm?.CheckoutJS) throw new Error("Paytm checkout could not be loaded.");
-          await window.Paytm.CheckoutJS.init({
-            root: "",
-            flow: "DEFAULT",
-            data: { orderId: payment.orderId, token: payment.txnToken, tokenType: "TXN_TOKEN", amount: String(payment.amount) },
-          });
-          window.Paytm.CheckoutJS.invoke();
-        } catch (err) {
-          setError(err.message || "Paytm checkout could not be started.");
-        }
-      };
-      script.onerror = () => setError("Paytm checkout could not be loaded.");
-      document.body.appendChild(script);
-      return;
+      setSuccess(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -81,10 +79,10 @@ function Enroll() {
 
             <div className="bg-green-600 text-white rounded-xl p-5">
               <CheckCircle size={42} className="mx-auto mb-3" />
-              <h2 className="text-xl md:text-2xl font-bold">Payment Details Submitted</h2>
+              <h2 className="text-xl md:text-2xl font-bold">Enrollment Successful!</h2>
 
               <p className="mt-2 text-sm md:text-base">
-                Your payment will be verified before enrollment is confirmed.
+                Welcome to the course. Check your email for course access details and study materials.
               </p>
             </div>
 
@@ -135,7 +133,7 @@ function Enroll() {
               type="submit"
               className="w-full bg-cyan-500 hover:bg-cyan-600 py-3 md:py-4 rounded-xl text-black font-bold cursor-pointer"
             >
-              {loading ? "Opening Paytm..." : "Pay ₹1 & Enroll"}
+              {loading ? "Enrolling..." : "Enroll Now"}
             </button>
 
             <Link

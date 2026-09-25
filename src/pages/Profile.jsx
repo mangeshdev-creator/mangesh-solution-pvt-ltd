@@ -53,8 +53,6 @@ const Profile = () => {
                 <p className="text-gray-400 mt-2">Fee: {formatCurrency(enrollment.course?.price)}</p>
                 <p className="text-gray-400">Duration: {enrollment.course?.duration}</p>
                 <p className="text-cyan-400 capitalize mt-3">Status: {enrollment.status}</p>
-                <p className="text-green-400 capitalize">Payment: {enrollment.paymentStatus}</p>
-                {enrollment.transactionId && <p className="text-gray-500 text-sm mt-1">UTR: {enrollment.transactionId}</p>}
                 {enrollment.course?.frontendId === 1 && (
                   <a
                     href="/Mangesh_Solution_React_JS_Development_Notes.pdf"

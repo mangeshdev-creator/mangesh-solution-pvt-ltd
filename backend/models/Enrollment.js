@@ -6,9 +6,7 @@ const enrollmentSchema = new mongoose.Schema({
   phone: { type: String, required: true, trim: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
-  status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
-  paymentStatus: { type: String, enum: ['pending', 'submitted', 'paid'], default: 'pending' },
-  transactionId: { type: String, trim: true },
+  status: { type: String, enum: ['confirmed', 'cancelled'], default: 'confirmed' },
 }, { timestamps: true });
 
 export default mongoose.model('Enrollment', enrollmentSchema);

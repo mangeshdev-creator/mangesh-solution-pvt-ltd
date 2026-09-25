@@ -31,16 +31,16 @@ export const sendWelcomeEmail = async ({ name, email }) => {
   return true;
 };
 
-export const sendEnrollmentEmail = async ({ name, email, courseTitle, coursePrice, transactionId }) => {
+export const sendEnrollmentEmail = async ({ name, email, courseTitle, coursePrice }) => {
   const transporter = getTransporter();
   if (!transporter) return false;
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: email,
-    subject: `Payment submitted: ${courseTitle}`,
-    text: `Hi ${name},\n\nYour payment details for ${courseTitle} were submitted for verification.\nCourse fee: ${coursePrice}\nUTR / Transaction ID: ${transactionId}\n\nThank you,\nMangesh Solution`,
-    html: `<p>Hi ${name},</p><p>Your payment details for <strong>${courseTitle}</strong> were submitted for verification.</p><p><strong>Course fee:</strong> ${coursePrice}<br /><strong>UTR / Transaction ID:</strong> ${transactionId}</p><p>Thank you,<br />Mangesh Solution</p>`,
+    subject: `Enrollment confirmed: ${courseTitle}`,
+    text: `Hi ${name},\n\nYour enrollment for ${courseTitle} has been confirmed!\nCourse fee: ${coursePrice}\n\nYou now have access to all course materials. Check your profile to access the course.\n\nThank you,\nMangesh Solution`,
+    html: `<p>Hi ${name},</p><p>Your enrollment for <strong>${courseTitle}</strong> has been confirmed!</p><p><strong>Course fee:</strong> ${coursePrice}</p><p>You now have access to all course materials. Check your profile to access the course.</p><p>Thank you,<br />Mangesh Solution</p>`,
   });
 
   return true;
