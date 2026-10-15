@@ -9,20 +9,6 @@ function Enroll() {
   const { id } = useParams();
   const course = courses.find((item) => item.id === Number(id));
 
-  if (!course) {
-    return (
-      <section className="min-h-screen bg-slate-950 flex items-center justify-center px-5 py-14">
-        <div className="bg-slate-900 rounded-3xl p-8 text-center max-w-md w-full">
-          <h1 className="text-2xl font-bold text-white">Course not found</h1>
-          <p className="text-gray-400 mt-3">This course is not available right now.</p>
-          <Link to="/courses" className="mt-6 inline-block bg-cyan-500 text-black font-bold px-6 py-3 rounded-xl">
-            Back to Courses
-          </Link>
-        </div>
-      </section>
-    );
-  }
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,7 +31,7 @@ function Enroll() {
     try {
       setLoading(true);
       setError("");
-      await apiRequest("/enrollments/create", {
+      await apiRequest("/enrollments", {
         method: "POST",
         body: JSON.stringify({ ...formData, courseId: id }),
       });
@@ -56,6 +42,20 @@ function Enroll() {
       setLoading(false);
     }
   };
+
+  if (!course) {
+    return (
+      <section className="min-h-screen bg-slate-950 flex items-center justify-center px-5 py-14">
+        <div className="bg-slate-900 rounded-3xl p-8 text-center max-w-md w-full">
+          <h1 className="text-2xl font-bold text-white">Course not found</h1>
+          <p className="text-gray-400 mt-3">This course is not available right now.</p>
+          <Link to="/courses" className="mt-6 inline-block bg-cyan-500 text-black font-bold px-6 py-3 rounded-xl">
+            Back to Courses
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="min-h-screen bg-slate-950 flex items-center justify-center px-5 sm:px-6 lg:px-8 py-14 md:py-20">
@@ -69,10 +69,6 @@ function Enroll() {
         <h2 className="text-xl md:text-2xl text-cyan-400 text-center mt-3">
           {course.title}
         </h2>
-
-        <p className="text-center text-gray-400 mt-2 text-sm md:text-base">
-          Fee : {course.price}
-        </p>
 
         {success ? (
           <div className="text-center mt-8">

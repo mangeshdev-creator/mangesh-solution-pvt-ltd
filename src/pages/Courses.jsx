@@ -12,7 +12,7 @@ function Courses() {
       .then((enrollments) => {
         setEnrolledCourseIds(
           enrollments
-            .filter((enrollment) => enrollment.status === "confirmed" && enrollment.paymentStatus === "paid")
+            .filter((enrollment) => enrollment.status === "confirmed")
             .map((enrollment) => enrollment.course?.frontendId)
         );
       })

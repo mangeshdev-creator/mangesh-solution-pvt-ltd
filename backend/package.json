@@ -14,7 +14,6 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
-    "nodemailer": "^10.0.1",
-    "paytmchecksum": "^1.5.1"
+    "nodemailer": "^10.0.1"
   }
 }
