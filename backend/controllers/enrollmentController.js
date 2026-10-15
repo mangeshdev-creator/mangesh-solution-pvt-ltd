@@ -25,7 +25,7 @@ export const createEnrollment = async (req, res) => {
       name,
       email,
       courseTitle: course.title,
-      coursePrice: course.price,
+      coursePrice: course.price === 0 ? 'Free' : course.price,
     });
   } catch (error) {
     console.error('Enrollment email failed:', error.message);
