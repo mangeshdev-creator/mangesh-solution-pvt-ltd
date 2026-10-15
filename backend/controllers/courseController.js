@@ -27,7 +27,7 @@ export const getCourse = async (req, res) => {
 };
 
 export const createCourse = async (req, res) => {
-  const { icon, title, duration, level, description } = req.body;
+  const { title, duration, level, description } = req.body;
   if (![title, duration, level, description].every((value) => typeof value === 'string' && value.trim())) {
     return res.status(400).json({ message: 'Course title, duration, level, and description are required' });
   }
@@ -35,7 +35,7 @@ export const createCourse = async (req, res) => {
   const latestCourse = await Course.findOne().sort({ frontendId: -1 }).select('frontendId');
   const course = await Course.create({
     frontendId: (latestCourse?.frontendId || 0) + 1,
-    icon: typeof icon === 'string' && icon.trim() ? icon.trim() : '📘',
+    icon: '📘',
     title: title.trim(),
     duration: duration.trim(),
     level: level.trim(),

@@ -17,7 +17,6 @@ const Admin = () => {
   const [noteSubmitting, setNoteSubmitting] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [courseForm, setCourseForm] = useState({
-    icon: "📘",
     title: "",
     duration: "",
     level: "Beginner",
@@ -106,7 +105,7 @@ const Admin = () => {
       });
       setCourses((current) => [...current, course]);
       setSelectedCourseId(String(course.frontendId));
-      setCourseForm({ icon: "📘", title: "", duration: "", level: "Beginner", description: "" });
+      setCourseForm({ title: "", duration: "", level: "Beginner", description: "" });
       setCourseMessage(`“${course.title}” added successfully. It is free and available on the Courses page.`);
     } catch (err) {
       setError(err.message);
@@ -226,26 +225,15 @@ const Admin = () => {
             <div className="grid lg:grid-cols-2 gap-6 mt-8">
               <form onSubmit={createCourse} className="bg-[#10273A] rounded-2xl p-6 space-y-4">
                 <h2 className="text-xl font-bold">Add a Free Course</h2>
-                <div className="grid sm:grid-cols-[100px_1fr] gap-4">
-                  <label className="text-sm text-gray-300">
-                    Icon
-                    <input
-                      value={courseForm.icon}
-                      onChange={(event) => setCourseForm({ ...courseForm, icon: event.target.value })}
-                      maxLength={8}
-                      className="mt-1 w-full rounded-lg bg-slate-800 p-3 text-white"
-                    />
-                  </label>
-                  <label className="text-sm text-gray-300">
-                    Course title
-                    <input
-                      required
-                      value={courseForm.title}
-                      onChange={(event) => setCourseForm({ ...courseForm, title: event.target.value })}
-                      className="mt-1 w-full rounded-lg bg-slate-800 p-3 text-white"
-                    />
-                  </label>
-                </div>
+                <label className="block text-sm text-gray-300">
+                  Course title
+                  <input
+                    required
+                    value={courseForm.title}
+                    onChange={(event) => setCourseForm({ ...courseForm, title: event.target.value })}
+                    className="mt-1 w-full rounded-lg bg-slate-800 p-3 text-white"
+                  />
+                </label>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <label className="text-sm text-gray-300">
                     Duration
