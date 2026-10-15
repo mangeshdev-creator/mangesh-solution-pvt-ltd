@@ -1,15 +1,21 @@
 import CourseCard from "../components/CourseCard";
-import courses from "../data/courses";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api";
 
 function Courses() {
+  const [courses, setCourses] = useState([]);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
+  const [error, setError] = useState("");
+  const [courseLoading, setCourseLoading] = useState(true);
 
   useEffect(() => {
-    apiRequest("/enrollments/me")
-      .then((enrollments) => {
+    let active = true;
+    Promise.all([apiRequest("/courses"), apiRequest("/enrollments/me")])
+      .then(([courseData, enrollments]) => {
+        if (!active) return;
+        setCourses(courseData);
+        setCourseLoading(false);
         setEnrolledCourseIds(
           enrollments
             .filter((enrollment) => enrollment.status === "confirmed")
@@ -17,9 +23,13 @@ function Courses() {
         );
       })
       .catch((err) => {
-        console.error("Could not load enrollment status:", err);
-        setEnrolledCourseIds([]);
+        if (active) {
+          setError(err.message);
+          setCourseLoading(false);
+        }
       });
+
+    return () => { active = false; };
   }, []);
 
   return (
@@ -40,17 +50,20 @@ function Courses() {
 
       {/* Course Cards */}
       <div className="max-w-7xl mx-auto mt-10 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {error && <p className="text-red-400 sm:col-span-2 lg:col-span-3 text-center">{error}</p>}
+        {!error && courseLoading && <p className="text-gray-400 sm:col-span-2 lg:col-span-3 text-center">Loading courses...</p>}
+        {!error && !courseLoading && courses.length === 0 && <p className="text-gray-400 sm:col-span-2 lg:col-span-3 text-center">No courses are available yet.</p>}
         {courses.map((course) => (
           <CourseCard
             key={course.id}
-            id={course.id}
+            id={course.frontendId}
             icon={course.icon}
             title={course.title}
             duration={course.duration}
             level={course.level}
-            price={course.price}
+            price={course.price === 0 ? "Free" : course.price}
             description={course.description}
-            isEnrolled={enrolledCourseIds.includes(course.id)}
+            isEnrolled={enrolledCourseIds.includes(course.frontendId)}
           />
         ))}
       </div>

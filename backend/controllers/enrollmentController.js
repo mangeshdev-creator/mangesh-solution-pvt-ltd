@@ -42,7 +42,7 @@ export const getEnrollments = async (_req, res) => {
 export const getMyEnrollments = async (req, res) => {
   const enrollments = await Enrollment.find({
     $or: [{ user: req.user._id }, { email: req.user.email }],
-  }).populate('course', 'frontendId title price duration').sort({ createdAt: -1 });
+  }).populate('course', 'frontendId title price duration notes').sort({ createdAt: -1 });
 
   res.json(enrollments);
 };

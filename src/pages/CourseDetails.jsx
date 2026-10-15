@@ -1,18 +1,30 @@
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
-import courses from "../data/courses";
+import { apiRequest } from "../api";
+import { formatCurrency } from "../utils/currency";
 
 function CourseDetails() {
   const { id } = useParams();
+  const [course, setCourse] = useState(null);
+  const [error, setError] = useState("");
 
-  const course = courses.find((item) => item.id === Number(id));
+  useEffect(() => {
+    let active = true;
+    apiRequest(`/courses/${id}`)
+      .then((courseData) => {
+        if (active) setCourse(courseData);
+      })
+      .catch((err) => {
+        if (active) setError(err.message);
+      });
+    return () => { active = false; };
+  }, [id]);
 
   if (!course) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-        <h1 className="text-2xl md:text-3xl font-bold">
-          Course Not Found
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{error || "Loading course..."}</h1>
       </div>
     );
   }
@@ -65,7 +77,7 @@ function CourseDetails() {
             </h3>
 
             <p className="mt-3 text-xl md:text-2xl font-bold">
-              {course.price}
+              {formatCurrency(course.price)}
             </p>
           </div>
 
@@ -90,7 +102,7 @@ function CourseDetails() {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mt-10 md:mt-12">
 
-          <Link to={`/enroll/${course.id}`} className="sm:w-auto">
+          <Link to={`/enroll/${course.frontendId}`} className="sm:w-auto">
             <button className="w-full bg-cyan-500 hover:bg-cyan-600 px-8 py-3 rounded-xl font-bold text-black cursor-pointer">
               Enroll Now
             </button>

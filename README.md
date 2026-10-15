@@ -35,6 +35,8 @@ Optional: create `.env` from `.env.example` if your API URL is different.
 - Course enrollment saves to MongoDB through `/api/enrollments`.
 - Contact form saves messages through `/api/contact`.
 - Courses can be served from `/api/courses`.
+- Admins can add free courses and upload PDF notes from the Admin Dashboard.
+- Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` in the backend environment to enable note uploads. PDF files are uploaded directly to Cloudinary and course-note download access is checked against the student's enrollment.
 
 ## Deploy frontend to GitHub Pages
 

@@ -8,12 +8,30 @@ const Profile = () => {
   const user = JSON.parse(localStorage.getItem("mangesh_user") || "{}");
   const [enrollments, setEnrollments] = useState([]);
   const [error, setError] = useState("");
+  const [noteError, setNoteError] = useState("");
 
   useEffect(() => {
     apiRequest("/enrollments/me")
       .then(setEnrollments)
       .catch((err) => setError(err.message));
   }, []);
+
+  const openNote = async (courseId, noteId) => {
+    const noteWindow = window.open("about:blank", "_blank");
+    if (!noteWindow) {
+      setNoteError("Please allow pop-ups to open your course notes.");
+      return;
+    }
+
+    try {
+      setNoteError("");
+      const { url } = await apiRequest(`/courses/${courseId}/notes/${noteId}/download-url`);
+      noteWindow.location.href = url;
+    } catch (err) {
+      noteWindow.close();
+      setNoteError(err.message);
+    }
+  };
 
   return (
     <section className="min-h-screen bg-[#08131F] text-white px-5 sm:px-6 lg:px-8 py-14 md:py-20">
@@ -38,6 +56,7 @@ const Profile = () => {
         <div className="mt-10">
           <h2 className="text-2xl md:text-3xl font-bold">My Enrollments</h2>
           {error && <p className="text-red-400 mt-4">{error}</p>}
+          {noteError && <p className="text-red-400 mt-4">{noteError}</p>}
 
           {!error && enrollments.length === 0 && (
             <div className="bg-[#10273A] rounded-2xl p-6 mt-5 text-gray-400">
@@ -53,7 +72,18 @@ const Profile = () => {
                 <p className="text-gray-400 mt-2">Fee: {formatCurrency(enrollment.course?.price)}</p>
                 <p className="text-gray-400">Duration: {enrollment.course?.duration}</p>
                 <p className="text-cyan-400 capitalize mt-3">Status: {enrollment.status}</p>
-                {enrollment.course?.frontendId === 1 && (
+                {enrollment.course?.notes?.map((note) => (
+                  <button
+                    key={note._id}
+                    type="button"
+                    onClick={() => openNote(enrollment.course.frontendId, note._id)}
+                    className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 px-4 py-3 font-semibold text-black transition hover:bg-cyan-400"
+                  >
+                    <Download size={18} />
+                    {note.title}
+                  </button>
+                ))}
+                {enrollment.course?.frontendId === 1 && enrollment.course.notes?.length === 0 && (
                   <a
                     href="/Mangesh_Solution_React_JS_Development_Notes.pdf"
                     target="_blank"

@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
-import courses from "../data/courses";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 
 function Enroll() {
   const { id } = useParams();
-  const course = courses.find((item) => item.id === Number(id));
+  const [course, setCourse] = useState(null);
+  const [courseError, setCourseError] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -18,6 +18,18 @@ function Enroll() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    apiRequest(`/courses/${id}`)
+      .then((courseData) => {
+        if (active) setCourse(courseData);
+      })
+      .catch((err) => {
+        if (active) setCourseError(err.message);
+      });
+    return () => { active = false; };
+  }, [id]);
 
   const handleChange = (e) => {
     setFormData({
@@ -47,8 +59,8 @@ function Enroll() {
     return (
       <section className="min-h-screen bg-slate-950 flex items-center justify-center px-5 py-14">
         <div className="bg-slate-900 rounded-3xl p-8 text-center max-w-md w-full">
-          <h1 className="text-2xl font-bold text-white">Course not found</h1>
-          <p className="text-gray-400 mt-3">This course is not available right now.</p>
+          <h1 className="text-2xl font-bold text-white">{courseError || "Loading course..."}</h1>
+          {courseError && <p className="text-gray-400 mt-3">This course is not available right now.</p>}
           <Link to="/courses" className="mt-6 inline-block bg-cyan-500 text-black font-bold px-6 py-3 rounded-xl">
             Back to Courses
           </Link>
